@@ -1,11 +1,17 @@
-const mainColor = "#ffba0d";
-const bgColor = "#223631";
+// regular colors
+// const mainColor = "#ffba0d";
+// const bgColor = "#223631";
+
+// suplab skin
+const mainColor = "#ffffff";
+const bgColor = "#000000";
+
 const cardTxt = {
-  x: 120,
+  x: window.innerWidth / 2 - 74,
   y: 120,
 };
 const gameExe = {
-  x: 240,
+  x: window.innerWidth / 2 + 30,
   y: 120,
 };
 // define rectangle center
@@ -13,23 +19,28 @@ const centerPoint = {
   x: 37,
   y: 46,
 };
+let showLinkedin = false;
 let anchorPoint = {
-  x: 200,
-  y: 200,
+  x: window.innerWidth / 2,
+  y: 240,
 };
+let businessCardCoordinates = {
+  x: anchorPoint.x,
+  y: anchorPoint.y,
+}
 let ball = {
-  x: 200,
-  y: 200,
-  direction: 'right'
+  x: window.innerWidth / 2,
+  y: 240,
+  direction: 'right',
+  acceleration: 1
 }
 // ball y modifier
 let heightModifier = {
-  value: 0,
   direction: 'neutral'
 };
 
 // game score
-let score = 1;
+let score = 0;
 let highScore = 0;
 
 let businessCard = false;
@@ -38,7 +49,7 @@ let showGameWindow = false;
 let isGameStarted = false;
 
 function setup() {
-  createCanvas(400, 400);
+  createCanvas(window.innerWidth, window.innerHeight);
 }
 
 function draw() {
@@ -46,16 +57,18 @@ function draw() {
 
   // mouse coordinates
   noStroke();
-  fill("white");
-  textSize(10);
-  textAlign(LEFT);
-  text(`mouseX: ${mouseX} | mouseY: ${mouseY}`, 10, 30);
+  // fill("white");
+  // textSize(10);
+  // textAlign(LEFT);
+  // text(`mouseX: ${mouseX} | mouseY: ${mouseY}`, 10, 30);
 
   textFont("Silkscreen");
-  textSize(10);
+  textSize(16);
   textAlign(CENTER);
   fill(mainColor);
-  text("Muril.Lab", width / 2, 50);
+  text("Muril_Lab", window.innerWidth / 2, 50);
+  // resets the text size for all the next text elements
+  textSize(12);
 
  if (showDesktop) {
     drawCard(cardTxt.x, cardTxt.y, "card.txt");
@@ -82,7 +95,7 @@ const drawCard = (x, y, textToWrite) => {
   line(x + 6, y + 88, x + 68, y + 88); //bottom
   line(x + 70, y + 6, x + 70, y + 86); //right
   line(x + 16, y + 4, x + 68, y + 4); //top
-  // top-right fold
+  // top-left fold
   line(x + 6, y + 10, x + 13, y + 4);
   line(x + 4, y + 22, x + 19, y + 22); //hor
   line(x + 22, y + 4, x + 22, y + 19); //vert
@@ -90,7 +103,7 @@ const drawCard = (x, y, textToWrite) => {
   // write card name
   noStroke();
   textAlign(CENTER);
-  text(textToWrite, x + 37, y + 102);
+  text(textToWrite, x + 37, y + 110);
 
   if (
     dist(cardTxt.x + centerPoint.x, cardTxt.y + centerPoint.y, mouseX, mouseY) <
@@ -127,33 +140,37 @@ const showBusinessCard = () => {
   // Draw the rectangle.
   fill(mainColor);
   rectMode(CENTER);
-  rect(anchorPoint.x, anchorPoint.y, 300, 150);
+  rect(businessCardCoordinates.x, businessCardCoordinates.y, 400, 200);
 
   // close card text
   fill(bgColor);
-  text("x", anchorPoint.x + 135, anchorPoint.y - 60);
+  text("x", businessCardCoordinates.x + 180, businessCardCoordinates.y - 80);
 
   // card title
-  textSize(12);
-  text(`murillo\ncreative developer`, anchorPoint.x, anchorPoint.y - 50);
+  textSize(16);
+  text(`murillo\ncreative developer`, businessCardCoordinates.x, businessCardCoordinates.y - 70);
   // card text 
-  textSize(10);
-  text(`Currently taking a postgraduate program\nin UX Design with 4+ years of experience\nin js frontend development`, anchorPoint.x, anchorPoint.y - 20);
+  textSize(12);
+  text(`Frontend developer with 4+ years of\nexperience working with js, currently\ntaking a postgraduate program\nin UX Design as well\n\n\nkeep creating`, businessCardCoordinates.x, businessCardCoordinates.y - 20);
 
   // enables card dragging
-  if (dist(mouseX, mouseY, anchorPoint.x, anchorPoint.y) < 40) {
+  if (dist(mouseX, mouseY, businessCardCoordinates.x, businessCardCoordinates.y) < 100) {
     cursor("grab");
 
     if (mouseIsPressed) {
-      anchorPoint.x = mouseX;
-      anchorPoint.y = mouseY;
+      businessCardCoordinates.x = mouseX;
+      businessCardCoordinates.y = mouseY;
     }
-  } else if (dist(mouseX, mouseY, anchorPoint.x + 135, anchorPoint.y - 60) <= 10) {
+  } else if (dist(mouseX, mouseY, businessCardCoordinates.x + 180, businessCardCoordinates.y - 80) <= 10) {
      // close card button
     cursor(HAND);
 
     if (mouseIsPressed) {
       businessCard = false;
+      businessCardCoordinates = {
+        x: anchorPoint.x,
+        y: anchorPoint.y,
+      }
       showDesktop = true;
     }
   } else cursor(ARROW);
@@ -171,6 +188,7 @@ const showGame = () => {
   // close game text
   fill(bgColor);
   noStroke();
+  textSize(10);
   text("x", anchorPoint.x + 180, anchorPoint.y - 180);
   
   // close game button
@@ -181,20 +199,44 @@ const showGame = () => {
       showGameWindow = false;
       isGameStarted = false;
       showDesktop = true;
+      removeElements();
     }
   } else cursor(ARROW);
   
   // start game text
   if (isGameStarted) {
     startGame();
+    removeElements();
   } else {
-    text(`Pressione um tecla para iniciar o joguinho\n\nHigh Score: ${highScore}`, anchorPoint.x, anchorPoint.y);
+    textSize(16);
+    text(`Pressione o botão do mouse para\niniciar o joguinho\n\nHigh Score: ${highScore}`, anchorPoint.x, anchorPoint.y - 30);
+    if (highScore > 5) {
+      textSize(10);
+      text(`Desbloqueou o meu Linkedin! Parabéns!`, anchorPoint.x, anchorPoint.y + 100);
+      if (showLinkedin) {
+        let a = createA(
+          'https://www.linkedin.com/in/murillobazilio/',
+          `<p style="font-family: 'Helvetica', 'Arial', sans-serif; text-align:center; letter-spacing: 1px;">🎖️ linkedin do Murillo</p>`,
+          '_blank'
+        );
+        a.position(anchorPoint.x - 87.74, anchorPoint.y + 120);
+      }
+      showLinkedin = false;
+    } else {
+      textSize(10);
+      text(`Supere meu recorde de 5 pontos para\ndesbloquear uma recompensa especial`, anchorPoint.x, anchorPoint.y + 150);
+    }
+    textSize(10);
+    text(`Left click to start game`, anchorPoint.x, anchorPoint.y - 150);
   }
 }
 
-function keyPressed() {
-  if (showGameWindow) {
+// start game if mouse is clicked and game window is shown
+function mouseClicked() {
+  if (showGameWindow && !isGameStarted) {
     isGameStarted = true;
+    // ball random start
+    ball.y = round(random(anchorPoint.y - 100, anchorPoint.y + 100));
   }
 }
 
@@ -202,34 +244,39 @@ const startGame = () => {
   fill(bgColor);
   rectMode(CENTER);
   let leftPad = {
-    x: anchorPoint.x - 150,
+    x: anchorPoint.x - 170,
     y: mouseY,
   }
   let rightPad = {
-    x: anchorPoint.x + 150,
+    x: anchorPoint.x + 170,
     y: mouseY,
   }
   rect(leftPad.x, mouseY, 20, 50, 5);
   rect(rightPad.x, mouseY, 20, 50, 5);
   
   // pads treshold
-  
+
   // ball movement
   if (ball.direction === 'right') {
     // adds the score amount to the ball 'acceleration'
-    ball.x = ball.x + score;
+    ball.x = ball.x + ball.acceleration;
     
     // increments heightModifier value based on direction
     if (heightModifier.direction === 'up') {
-      ball.y = ball.y - score;
+      ball.y = ball.y - ball.acceleration;
     } else if (heightModifier.direction === 'down') {
-      ball.y = ball.y + score;
+      ball.y = ball.y + ball.acceleration;
     } else ball.y = ball.y;
     
     // if ball touches the pad goes to opposite direction, accelerates and player scores
-    if (dist(ball.x, ball.y, rightPad.x, rightPad.y) < 25) {
+    if (dist(ball.x, ball.y, rightPad.x, rightPad.y) < 20) {
       ball.direction = 'left';
       score++;
+      if (ball.acceleration < 6) {
+        ball.acceleration++;
+      } else if (score > 30 && score < 90) {
+        ball.acceleration++;
+      }
       
       // changes ball height based on where it touches on the pad
       if (ball.y > rightPad.y) {
@@ -241,19 +288,22 @@ const startGame = () => {
   } 
   
   if (ball.direction === 'left') {
-    ball.x = ball.x - score;
+    ball.x = ball.x - ball.acceleration;
     
     // increments heightModifier value based on direction
     if (heightModifier.direction === 'up') {
-      ball.y = ball.y - score;
+      ball.y = ball.y - ball.acceleration;
     } else if (heightModifier.direction === 'down') {
-      ball.y = ball.y + score;
+      ball.y = ball.y + ball.acceleration;
     } else ball.y = ball.y;
         
     // if ball touches the pad goes to opposite direction, accelerates and player scores
-    if (dist(ball.x, ball.y, leftPad.x, leftPad.y) < 25) {
+    if (dist(ball.x, ball.y, leftPad.x, leftPad.y) < 20) {
       ball.direction = 'right';
       score++;
+      if (ball.acceleration < 6) {
+        ball.acceleration++;
+      }
       
       // changes ball height based on where it touches on the pad
       if (ball.y > leftPad.y) {
@@ -265,28 +315,35 @@ const startGame = () => {
   }
   
   // if ball touches vertical edge, game is reset
-  if (ball.x > 385 || ball.x < 15) {
+  if (ball.x > anchorPoint.x + 185 || ball.x < anchorPoint.x - 185) {
     isGameStarted = false;
-    ball.x = 200;
-    ball.y = 200;
+    ball.x = anchorPoint.x;
+    ball.y = anchorPoint.y;
     if (score > highScore) {
       highScore = score;
     }
-    score = 1;
+    if (highScore > 5) {
+      showLinkedin = true;
+    }
+    score = 0;
+    ball.acceleration = 1;
     ball.direction = 'right';
     heightModifier.direction = 'neutral';
   }
   
   // if ball touches horizontal edge, changes vertical orientation
-  if (ball.y > 380) heightModifier.direction = 'up';
-  if (ball.y < 20) heightModifier.direction = 'down';
+  if (ball.y > anchorPoint.y + 180) heightModifier.direction = 'up';
+  if (ball.y < anchorPoint.y - 180) heightModifier.direction = 'down';
   
   // draw ball
   noStroke();
   circle (ball.x, ball.y, 20);
-  text (`x: ${ball.x} y: ${ball.y}`, ball.x, ball.y + 20);
-  text (`${heightModifier.direction}`, ball.x, ball.y + 40);
   
-  // score on top left corner
-  text (`Score: ${score - 1}`, anchorPoint.x, anchorPoint.y - 150);
+  // score on top
+  textSize(12);
+  text (`Score: ${score}`, anchorPoint.x, anchorPoint.y - 150);
+}
+
+function windowResized() {
+  resizeCanvas(window.innerWidth, window.innerHeight);
 }
