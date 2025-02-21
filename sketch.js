@@ -7,11 +7,11 @@ const mainColor = "#ffffff";
 const bgColor = "#000000";
 
 const cardTxt = {
-  x: window.innerWidth / 2 - 74,
+  x: window.innerWidth / 2 - 94,
   y: 120,
 };
 const gameExe = {
-  x: window.innerWidth / 2 + 30,
+  x: window.innerWidth / 2 + 20,
   y: 120,
 };
 // define rectangle center
@@ -72,7 +72,7 @@ function draw() {
 
  if (showDesktop) {
     drawCard(cardTxt.x, cardTxt.y, "card.txt");
-    drawCard(gameExe.x, gameExe.y, "game.exe");
+    drawCard(gameExe.x, gameExe.y, "game.exe");   
  } else if (businessCard) {
     showBusinessCard();
   } else if (showGameWindow) {
